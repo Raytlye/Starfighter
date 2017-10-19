@@ -15,6 +15,8 @@ starfighter_width = 160
 
 highscore = 0
 
+paused = False
+
 gameDisplay = pygame.display.set_mode((display_width,display_height))
 pygame.display.set_caption('A bit Racey')
 clock = pygame.time.Clock()
@@ -76,6 +78,52 @@ def message_display(text):
 def crash():
     message_display('Crashed you have')
 
+def pause():
+
+    global paused
+
+    while paused:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.type == pygame.K_ESCAPE:
+                    paused = False
+                
+        largeText = pygame.font.Font('freesansbold.ttf',85)
+        TextSurf, TextRect = text_objects("Paused", largeText)
+        TextRect.center = ((display_width/2),(display_height/2))
+        
+        gameDisplay.blit(TextSurf, TextRect)
+        pygame.display.update()
+
+def game_intro():
+
+    intro = True
+
+    while intro:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.KEYDOWN:
+                intro = False
+                
+        gameDisplay.blit(backgroundImg, (0,0))
+        largeText = pygame.font.Font('freesansbold.ttf',85)
+        TextSurf, TextRect = text_objects("Starfighter", largeText)
+        TextRect.center = ((display_width/2),(display_height/2))
+        gameDisplay.blit(TextSurf, TextRect)
+        
+        smallText = pygame.font.Font('freesansbold.ttf',35)
+        TextSurf, TextRect = text_objects("Press any key", smallText)
+        TextRect.center = ((display_width/2),(display_height/2 + 50))
+
+        gameDisplay.blit(TextSurf, TextRect)
+        pygame.display.update()
+        
+
 
 def game_loop():
     x = (display_width * 0.45)
@@ -95,6 +143,8 @@ def game_loop():
 
     get_highscore()
 
+    global paused
+
     while not gameExit:
 
         for event in pygame.event.get():
@@ -107,6 +157,9 @@ def game_loop():
                     x_change = -5
                 elif event.key == pygame.K_RIGHT:
                     x_change = 5
+                elif event.key == pygame.K_ESCAPE:
+                    paused = True
+                    pause()
 
 
             if event.type == pygame.KEYUP:
@@ -141,7 +194,7 @@ def game_loop():
         pygame.display.update()
         clock.tick(60)
 
-
+game_intro()
 game_loop()
 pygame.quit()
 quit()
