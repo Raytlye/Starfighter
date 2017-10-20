@@ -14,17 +14,19 @@ white = (255,255,255)
 starfighter_width = 160
 
 highscore = 0
-
+icon = pygame.image.load('images/StarFighterBigIcon.png')
+icon = pygame.transform.scale(icon, (32,32))
+pygame.display.set_icon(icon)
 gameDisplay = pygame.display.set_mode((display_width,display_height))
-pygame.display.set_caption('A bit Racey')
+pygame.display.set_caption('Starfighter')
 clock = pygame.time.Clock()
 
-backgroundImg = pygame.image.load('background.jpg')
+backgroundImg = pygame.image.load('images/background.jpg')
 
-asteroidImg = pygame.image.load('asteroid.png')
+asteroidImg = pygame.image.load('images/asteroid.png')
 asteroidImg = pygame.transform.scale(asteroidImg, (100,100))
 
-starfighterImg = pygame.image.load('x_wing.png')
+starfighterImg = pygame.image.load('images/x_wing.png')
 starfighterImg = pygame.transform.scale(starfighterImg, (160, 100))
 
 def save_score(score):
@@ -37,7 +39,8 @@ def save_score(score):
 def get_highscore():
     d = shelve.open('score.txt')
     global highscore
-    highscore = d['score']
+    if d['score']:
+        highscore = d['score']
     d.close()
 
 def display_highscore():
@@ -76,6 +79,50 @@ def message_display(text):
 def crash():
     message_display('Crashed you have')
 
+def pause():
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    return False
+                
+        largeText = pygame.font.Font('freesansbold.ttf',85)
+        TextSurf, TextRect = text_objects("Paused", largeText)
+        TextRect.center = ((display_width/2),(display_height/2))
+        
+        gameDisplay.blit(TextSurf, TextRect)
+        pygame.display.update()
+
+def game_intro():
+
+    intro = True
+
+    while intro:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.KEYDOWN:
+                intro = False
+                
+        gameDisplay.blit(backgroundImg, (0,0))
+        largeText = pygame.font.Font('freesansbold.ttf',85)
+        TextSurf, TextRect = text_objects("Starfighter", largeText)
+        TextRect.center = ((display_width/2),(display_height/2))
+        gameDisplay.blit(TextSurf, TextRect)
+        
+        smallText = pygame.font.Font('freesansbold.ttf',35)
+        TextSurf, TextRect = text_objects("Press any key", smallText)
+        TextRect.center = ((display_width/2),(display_height/2 + 50))
+
+        gameDisplay.blit(TextSurf, TextRect)
+        pygame.display.update()
+        
+
 
 def game_loop():
     x = (display_width * 0.45)
@@ -95,6 +142,8 @@ def game_loop():
 
     get_highscore()
 
+    global paused
+
     while not gameExit:
 
         for event in pygame.event.get():
@@ -107,6 +156,8 @@ def game_loop():
                     x_change = -5
                 elif event.key == pygame.K_RIGHT:
                     x_change = 5
+                elif event.key == pygame.K_ESCAPE:
+                    pause()
 
 
             if event.type == pygame.KEYUP:
@@ -141,7 +192,7 @@ def game_loop():
         pygame.display.update()
         clock.tick(60)
 
-
+game_intro()
 game_loop()
 pygame.quit()
 quit()
