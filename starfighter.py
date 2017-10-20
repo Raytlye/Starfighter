@@ -14,19 +14,19 @@ white = (255,255,255)
 starfighter_width = 160
 
 highscore = 0
-
-paused = False
-
+icon = pygame.image.load('images/StarFighterBigIcon.png')
+icon = pygame.transform.scale(icon, (32,32))
+pygame.display.set_icon(icon)
 gameDisplay = pygame.display.set_mode((display_width,display_height))
-pygame.display.set_caption('A bit Racey')
+pygame.display.set_caption('Starfighter')
 clock = pygame.time.Clock()
 
-backgroundImg = pygame.image.load('background.jpg')
+backgroundImg = pygame.image.load('images/background.jpg')
 
-asteroidImg = pygame.image.load('asteroid.png')
+asteroidImg = pygame.image.load('images/asteroid.png')
 asteroidImg = pygame.transform.scale(asteroidImg, (100,100))
 
-starfighterImg = pygame.image.load('x_wing.png')
+starfighterImg = pygame.image.load('images/x_wing.png')
 starfighterImg = pygame.transform.scale(starfighterImg, (160, 100))
 
 def save_score(score):
@@ -39,7 +39,8 @@ def save_score(score):
 def get_highscore():
     d = shelve.open('score.txt')
     global highscore
-    highscore = d['score']
+    if d['score']:
+        highscore = d['score']
     d.close()
 
 def display_highscore():
@@ -80,16 +81,14 @@ def crash():
 
 def pause():
 
-    global paused
-
-    while paused:
+    while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
             if event.type == pygame.KEYDOWN:
-                if event.type == pygame.K_ESCAPE:
-                    paused = False
+                if event.key == pygame.K_ESCAPE:
+                    return False
                 
         largeText = pygame.font.Font('freesansbold.ttf',85)
         TextSurf, TextRect = text_objects("Paused", largeText)
@@ -158,7 +157,6 @@ def game_loop():
                 elif event.key == pygame.K_RIGHT:
                     x_change = 5
                 elif event.key == pygame.K_ESCAPE:
-                    paused = True
                     pause()
 
 
